@@ -2,14 +2,15 @@ import requests
 import json
 from bs4 import BeautifulSoup
 
-URL = ["http://books.toscrape.com/"]
 def run_automatic_scrape():
     
     results = []
     print("Starting automatic scrape...")
     
 
-    for url in URL:
+    for i in range (1,6):
+        url = f"http://books.toscrape.com/catalogue/page-{i}.html"
+        
         try:
             response = requests.get(url)
             soup = BeautifulSoup(response.content, 'html.parser')
@@ -71,5 +72,5 @@ def run_automatic_scrape():
             
     print("Saved to scraped_data.json")
 
-if __name__ == "__main__":
-    run_automatic_scrape()
+
+run_automatic_scrape()
