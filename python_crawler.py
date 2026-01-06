@@ -2,15 +2,12 @@ import requests
 import json
 from bs4 import BeautifulSoup
 
-# PROBLEM 1: Hardcoded URLs (We want to discover these automatically)
 URL = ["http://books.toscrape.com/"]
-
 def run_automatic_scrape():
+    
     results = []
     print("Starting automatic scrape...")
     
-
-
 
     for url in URL:
         try:
@@ -19,25 +16,56 @@ def run_automatic_scrape():
             all_books = soup.find_all("article", class_="product_pod")
 
             for book in all_books:
+
+                #Title
                 title_tag = book.find("h3").find("a")
                 title = title_tag["title"]
-                price = book.find('p', class_='price_color').text
-                availability = book.find('p', class_='instock availability').text.strip()
-            
+
+                #Link
+                href = title_tag["href"]
+                link = "http://books.toscrape.com/" + href
+
+                #Price
+                price = book.find("p", class_='price_color').text
+
+                #Availability
+                availability = book.find("p", class_='instock availability').text.strip()
+                
+                #Rating
+                star_tag = book.find("p", class_="star-rating")
+                rating_class = star_tag["class"][1]
+                
+                match rating_class:
+                    case "One": rating = 1
+                    case "Two": rating = 2
+                    case "Three": rating = 3
+                    case "Four": rating = 4
+                    case "Five": rating = 5
+                    
+                #Image
+                image_tag = book.find("img")
+                img = image_tag["src"]
+                image_url = "http://books.toscrape.com/" + img
+
                 book_data = {
                     "title": title,
                     "price": price,
-                    "availability": availability
+                    "availability": availability,
+                    "rating": rating,
+                    "image_url": image_url,
+                    "book_url": link
                 }
-                
                 results.append(book_data)
+
+                
+                
                 print(f"Scraped: {title}")
             pass
             
         except Exception as e:
             print(f"Error scraping {url}: {e}")
 
-    # PROBLEM 2: Saving to a text file (We want a Database)
+
     with open("scraped_data.json", "w", encoding="utf-8") as f:
         json.dump(results, f, indent=4, ensure_ascii=False)
             
