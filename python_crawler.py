@@ -9,6 +9,7 @@ def run_automatic_scrape():
     
 
     for i in range (1,6):
+        
         url = f"http://books.toscrape.com/catalogue/page-{i}.html"
         
         try:
@@ -24,7 +25,7 @@ def run_automatic_scrape():
 
                 #Link
                 href = title_tag["href"]
-                link = "http://books.toscrape.com/" + href
+                link = "http://books.toscrape.com/catalogue/" + href
 
                 #Price
                 price = book.find("p", class_='price_color').text
