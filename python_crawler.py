@@ -9,7 +9,7 @@ def run_automatic_scrape():
     
 
     for i in range (1,6):
-        
+
         url = f"http://books.toscrape.com/catalogue/page-{i}.html"
         
         try:
@@ -73,5 +73,5 @@ def run_automatic_scrape():
             
     print("Saved to scraped_data.json")
 
-
-run_automatic_scrape()
+if __name__ == "__main__":
+    run_automatic_scrape()
