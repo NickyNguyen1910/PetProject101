@@ -1,2 +1,5 @@
+
+#Crawler dependencies
+- Python 3.10.12 or higher
 requests
 beautifulsoup4
