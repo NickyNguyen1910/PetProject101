@@ -59,14 +59,11 @@ def run_automatic_scrape():
                 }
                 results.append(book_data)
 
-                
-                
                 print(f"Scraped: {title}")
             pass
             
         except Exception as e:
             print(f"Error scraping {url}: {e}")
-
 
     with open("scraped_data.json", "w", encoding="utf-8") as f:
         json.dump(results, f, indent=4, ensure_ascii=False)
@@ -75,3 +72,5 @@ def run_automatic_scrape():
 
 if __name__ == "__main__":
     run_automatic_scrape()
+
+    
