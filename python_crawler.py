@@ -1,6 +1,51 @@
 import requests
 import json
 from bs4 import BeautifulSoup
+import psycopg2
+import os
+from dotenv import load_dotenv
+load_dotenv()
+
+def connect_to_db():
+
+    print("Connecting to the database...")
+
+    try:
+        conn = psycopg2.connect(
+            dbname=os.getenv("DB_NAME"),
+            user=os.getenv("DB_USER"),
+            host=os.getenv("DB_HOST"),
+            password=os.getenv("DB_PASSWORD")
+        )
+        print("ze bluetooth device iz connected successfully")
+    except:
+        print("Unable to connect to the database")
+    return conn
+
+def create_table(conn):
+
+    print("Creating table...")
+
+    with conn.cursor() as curs:
+
+        try:
+            curs.execute("""
+                CREATE TABLE IF NOT EXISTS books (
+                    id SERIAL PRIMARY KEY,
+                    title TEXT,
+                    price NUMERIC,
+                    availability TEXT,
+                    rating INTEGER,
+                    image_url TEXT,
+                    book_url TEXT UNIQUE
+                );
+                """)
+            print("Table created successfully")
+
+        except (Exception, psycopg2.DatabaseError) as error:
+            print(error)
+
+    conn.commit()
 
 def run_automatic_scrape():
     
@@ -28,7 +73,8 @@ def run_automatic_scrape():
                 link = "http://books.toscrape.com/catalogue/" + href
 
                 #Price
-                price = book.find("p", class_='price_color').text
+                price_dirty = book.find("p", class_='price_color').text
+                price = price_dirty.replace("£", "")
 
                 #Availability
                 availability = book.find("p", class_='instock availability').text.strip()
@@ -59,8 +105,7 @@ def run_automatic_scrape():
                 }
                 results.append(book_data)
 
-                print(f"Scraped: {title}")
-            pass
+            
             
         except Exception as e:
             print(f"Error scraping {url}: {e}")
@@ -69,8 +114,38 @@ def run_automatic_scrape():
         json.dump(results, f, indent=4, ensure_ascii=False)
             
     print("Saved to scraped_data.json")
+    return results
+
+
+def insert_book(results, conn):
+    with conn.cursor() as curs:
+
+        try:
+
+            for book_data in results: 
+                
+                curs.execute("""
+                    INSERT INTO books (title, price, availability, rating, image_url, book_url)
+                    VALUES (%s, %s, %s, %s, %s, %s)
+                """, (book_data["title"],
+                      book_data["price"],
+                      book_data["availability"],
+                      book_data["rating"],
+                      book_data["image_url"],
+                      book_data["book_url"]))
+
+            print("Book inserted successfully")
+        except (Exception, psycopg2.DatabaseError) as error:
+            print(error)
+        conn.commit() 
+
+
 
 if __name__ == "__main__":
-    run_automatic_scrape()
+    conn = connect_to_db()
+    create_table(conn)
+    results = run_automatic_scrape()
+    insert_book(results, conn)
+    conn.close()
 
     
