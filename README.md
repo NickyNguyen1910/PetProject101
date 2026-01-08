@@ -56,23 +56,3 @@ DB_PORT=5432
    docker run -it --rm --name python_crawler --env-file .env python_crawler
    ```
    _Note: Ensure your `.env` file is properly configured. If connecting to a database on the host machine from Docker, you may need to use `host.docker.internal` as the `DB_HOST`._
-
-## Database Schema
-
-The script creates a `books` table with the following structure:
-
-| Column | Type | Description |
-|README.md |------- |------------------------------|
-| `id` | SERIAL | Primary Key |
-| `title` | TEXT | Book title |
-| `price` | NUMERIC | Price (without currency symbol)|
-| `availability`| TEXT | Stock status |
-| `rating` | INTEGER | 1-5 star rating |
-| `image_url` | TEXT | URL of the book cover |
-| `book_url` | TEXT | Unique URL of the book page |
-
-## Output
-
-- **Console**: Progress logs for database connection, table creation, scraping status, and insertion.
-- **File**: `scraped_data.json` generated in the project root.
-- **Database**: Populated `books` table.
