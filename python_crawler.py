@@ -123,16 +123,18 @@ def insert_book(results, conn):
         try:
 
             for book_data in results: 
-                
+
                 curs.execute("""
                     INSERT INTO books (title, price, availability, rating, image_url, book_url)
                     VALUES (%s, %s, %s, %s, %s, %s)
+                    ON CONFLICT (book_url) DO NOTHING; 
                 """, (book_data["title"],
                       book_data["price"],
                       book_data["availability"],
                       book_data["rating"],
                       book_data["image_url"],
                       book_data["book_url"]))
+                    
 
             print("Book inserted successfully")
         except (Exception, psycopg2.DatabaseError) as error:
