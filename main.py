@@ -16,15 +16,10 @@ conn = psycopg2.connect(
         cursor_factory=RealDictCursor
     )
 
-# Open a cursor to perform database operations
-cursor = conn.cursor()
-
-#creating an endpoint/path
 
 @app.get("/books")
 async def read_books():
-    cursor.execute("SELECT * FROM books")
-    books = cursor.fetchall()
+    with conn.cursor() as cur:
+        cur.execute("SELECT * FROM books")
+        books = cur.fetchall()
     return {"books": books}
-cursor.close()
-conn.close()
