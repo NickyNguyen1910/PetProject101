@@ -9,10 +9,10 @@ app = FastAPI()
 
 # Connect to an existing database
 conn = psycopg2.connect(
-        dbname=os.getenv("DB_NAME"),
-        user=os.getenv("DB_USER"),
-        host=os.getenv("DB_HOST"),
-        password=os.getenv("DB_PASSWORD"),
+        dbname=os.getenv("POSTGRES_NAME"),
+        user=os.getenv("POSTGRES_USER"),
+        host=os.getenv("POSTGRES_HOST"),
+        password=os.getenv("POSTGRES_PASSWORD"),
         cursor_factory=RealDictCursor
     )
 
