@@ -4,3 +4,7 @@
 
 # Ignore JSON files
 *.json
+
+# Ignore Python compiled files
+*.pyc
+__pycache__/

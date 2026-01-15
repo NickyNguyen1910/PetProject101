@@ -127,7 +127,7 @@ def insert_book(results, conn):
                 curs.execute("""
                     INSERT INTO books (title, price, availability, rating, image_url, book_url)
                     VALUES (%s, %s, %s, %s, %s, %s)
-                    ON CONFLICT (book_url) DO NOTHING; 
+                    # ON CONFLICT (book_url) DO NOTHING; 
                 """, (book_data["title"],
                       book_data["price"],
                       book_data["availability"],
