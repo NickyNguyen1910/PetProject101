@@ -1,0 +1,30 @@
+name: CI Protocol
+
+run-name: CI Protocol
+
+on: 
+  push:
+    branches:
+      - main
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+    - name: Checkout Code
+      uses: actions/checkout@v3
+
+    - name: Set up Python
+      uses: actions/setup-python@v3
+      with:
+        python-version: '3.10'
+
+    - name: Run App Tests
+
+      run: |
+        python app/main.py test
+
+    - name: Run Script Tests
+
+      run: |
+        python script/python_crawler.py test
