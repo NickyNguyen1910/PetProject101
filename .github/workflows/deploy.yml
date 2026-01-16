@@ -1,36 +1,85 @@
-name: CI Protocol
+name: Build & Push to ECR, then Deploy to EC2
 
-run-name: CI Protocol
-
-on: 
+on:
   push:
-    branches:
-      - main
+    branches: [ main ]
+
+env:
+  AWS_REGION: ap-southeast-1                  
+  ECR_REPOSITORY_APP: petproject101-web          
+  ECR_REPOSITORY_SCRIPT: petproject101-script   
+  ECR_REGISTRY_URI: 157018355309.dkr.ecr.ap-southeast-1.amazonaws.com 
 
 jobs:
-  tests:
+  
+  build-and-push:
     runs-on: ubuntu-latest
+    
     steps:
     - name: Checkout Code
       uses: actions/checkout@v3
 
-    - name: Set up Python
-      uses: actions/setup-python@v3
+    
+    - name: Configure AWS Credentials
+      uses: aws-actions/configure-aws-credentials@v2
       with:
-        python-version: '3.10'
+        aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+        aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+        aws-region: ${{ env.AWS_REGION }}
 
-    - name: Install Dependencies
+    
+    - name: Login to Amazon ECR
+      id: login-ecr
+      uses: aws-actions/amazon-ecr-login@v1
+
+    
+    - name: Build & Push App Image
+      env:
+        ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
+        IMAGE_TAG: latest 
       run: |
-        pip install -r requirements.txt
+        docker build -t $ECR_REGISTRY/$ECR_REPOSITORY_APP:$IMAGE_TAG -f app/Dockerfile ./app
+        docker push $ECR_REGISTRY/$ECR_REPOSITORY_APP:$IMAGE_TAG
 
-
-
-    - name: Run App Tests
-
+    
+    - name: Build & Push Script Image
+      env:
+        ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
+        IMAGE_TAG: latest
       run: |
-        python app/main.py test
+        docker build -t $ECR_REGISTRY/$ECR_REPOSITORY_SCRIPT:$IMAGE_TAG -f script/Dockerfile ./script
+        docker push $ECR_REGISTRY/$ECR_REPOSITORY_SCRIPT:$IMAGE_TAG
 
-    - name: Run Script Tests
-
-      run: |
-        python script/python_crawler.py test
+  # GIAI ĐOẠN 2: GIAO HÀNG TẬN NƠI (DEPLOY TO EC2)
+  deploy-to-ec2:
+    needs: build-and-push # Phải đợi giai đoạn 1 xong mới được chạy
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: SSH and Deploy
+      uses: appleboy/ssh-action@v1.0.3
+      with:
+        host: ${{ secrets.EC2_HOST }}
+        username: ${{ secrets.EC2_USER }}
+        key: ${{ secrets.EC2_SSH_KEY }}
+        port: 22
+        # Truyền biến môi trường vào trong script SSH
+        envs: AWS_REGION, ECR_REGISTRY_URI
+        script: |
+          
+          cd PetProject101
+          
+          
+          git pull origin main
+          
+          
+          aws ecr get-login-password --region $AWS_REGION | sudo docker login --username AWS --password-stdin $ECR_REGISTRY_URI
+          
+          
+          sudo docker compose pull
+          
+          
+          sudo docker compose up -d
+          
+          
+          sudo docker image prune -f
