@@ -87,4 +87,4 @@ jobs:
 
           sudo docker-compose up -d web script 
           
-          sudo docker image prune -f
+          sudo docker image prune -f || true
