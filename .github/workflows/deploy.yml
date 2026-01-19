@@ -68,18 +68,16 @@ jobs:
           
           cd PetProject101
           
-          
           git pull origin main
-          
           
           aws ecr get-login-password --region $AWS_REGION | sudo docker login --username AWS --password-stdin $ECR_REGISTRY_URI
           
-          
-          sudo docker compose pull
-          
-          
-          sudo docker compose up -d
-          
+          sudo docker-compose pull
 
+          sudo docker-compose up -d db
+
+          sleep 30
+
+          sudo docker-compose up -d web script 
           
           sudo docker image prune -f
