@@ -50,9 +50,9 @@ jobs:
         docker build -t $ECR_REGISTRY/$ECR_REPOSITORY_SCRIPT:$IMAGE_TAG -f script/Dockerfile ./script
         docker push $ECR_REGISTRY/$ECR_REPOSITORY_SCRIPT:$IMAGE_TAG
 
-  # GIAI ĐOẠN 2: GIAO HÀNG TẬN NƠI (DEPLOY TO EC2)
+  
   deploy-to-ec2:
-    needs: build-and-push # Phải đợi giai đoạn 1 xong mới được chạy
+    needs: build-and-push 
     runs-on: ubuntu-latest
     
     steps:
@@ -63,7 +63,6 @@ jobs:
         username: ${{ secrets.EC2_USER }}
         key: ${{ secrets.EC2_SSH_KEY }}
         port: 22
-        # Truyền biến môi trường vào trong script SSH
         envs: AWS_REGION, ECR_REGISTRY_URI
         script: |
           
@@ -81,5 +80,6 @@ jobs:
           
           sudo docker compose up -d
           
+
           
           sudo docker image prune -f
