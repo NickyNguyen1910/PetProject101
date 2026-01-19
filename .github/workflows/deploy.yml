@@ -65,8 +65,7 @@ jobs:
         port: 22
         envs: AWS_REGION, ECR_REGISTRY_URI
         script: |
-
-          sudo apt-get install awscli -y        
+       
           
           cd PetProject101
 
