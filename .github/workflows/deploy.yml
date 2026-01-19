@@ -77,12 +77,12 @@ jobs:
           
           aws ecr get-login-password --region $AWS_REGION | sudo docker login --username AWS --password-stdin $ECR_REGISTRY_URI
           
-          sudo docker compose pull
+          sudo docker-compose pull
 
-          sudo docker compose up -d db
+          sudo docker-compose up -d db
 
           sleep 30
 
-          sudo docker compose up -d web script 
+          sudo docker-compose up -d web script 
           
           sudo docker image prune -f
