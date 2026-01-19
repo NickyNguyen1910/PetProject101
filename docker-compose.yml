@@ -22,7 +22,7 @@ services:
 
   web:
     container_name: petproject101-web
-    build: ./app
+    image: 157018355309.dkr.ecr.ap-southeast-1.amazonaws.com/petproject101-web:latest
     env_file:
       - .env
     ports:
@@ -35,7 +35,7 @@ services:
 
   script:
     container_name: petproject101-script
-    build: ./script
+    image: 157018355309.dkr.ecr.ap-southeast-1.amazonaws.com/petproject101-script:latest
     env_file:
       - .env
     volumes:
