@@ -73,8 +73,6 @@ jobs:
 
           git reset --hard origin/main
           
-          git pull origin main
-          
           aws ecr get-login-password --region $AWS_REGION | sudo docker login --username AWS --password-stdin $ECR_REGISTRY_URI
           
           sudo docker-compose pull
